@@ -1,0 +1,12 @@
+name: paddle_env
+channels:
+  - conda-forge
+  - defaults
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/Paddle
+dependencies:
+  - python=3.8
+  - numpy
+  - opencv
+  - pip:
+    - paddleocr>=2.6.0.3
+    - paddleclas>=2.4.3
