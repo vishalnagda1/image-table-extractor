@@ -1,61 +1,68 @@
 import os
 import cv2
-from paddleocr import PPStructure, draw_structure_result, save_structure_res, draw_ocr
+from paddleocr import (
+    PaddleOCR,
+    PPStructure,
+    draw_ocr,
+    draw_structure_result,
+    save_structure_res,
+)
 from PIL import Image
 
-def load_image(image_path):
-    """Load an image from the specified path."""
-    if not os.path.exists(image_path):
-        raise FileNotFoundError(f"The image path {image_path} does not exist.")
-    return cv2.imread(image_path)
+# Constants
+SAVE_FOLDER = "./output"
+IMG_PATH = "./sample/CM-HU1157_10.png"
+FONT_PATH = "./fonts/german.ttf"
 
-def detect_table_structure(image, lang='en'):
-    """Detect table structure in the image using PaddleOCR."""
-    table_engine = PPStructure(show_log=True, image_orientation=True, lang=lang)
-    return table_engine(image)
+def ensure_directory_exists(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
-def save_detection_results(results, save_folder, image_basename):
-    """Save detection results to the specified folder."""
-    if not os.path.exists(save_folder):
-        os.makedirs(save_folder)
-    save_structure_res(results, save_folder, image_basename.split('.')[0])
+def table_detection(image_path, save_folder):
+    table_engine = PPStructure(show_log=True, image_orientation=True, lang="en")
+    img = cv2.imread(image_path)
+    result = table_engine(img)
+    save_structure_res(result, save_folder, os.path.basename(image_path).split(".")[0])
 
-def draw_and_save_results(image, results, font_path, output_file):
-    """Draw and save the OCR results on the image."""
-    im_show = draw_structure_result(image, results, font_path=font_path)
+    for line in result:
+        line.pop("img")
+        print(line)
+
+    return result
+
+def draw_table_results(image_path, result, font_path, save_folder):
+    image = Image.open(image_path).convert("RGB")
+    im_show = draw_structure_result(image, result, font_path=font_path)
     im_show = Image.fromarray(im_show)
-    im_show.save(output_file)
+    im_show.save(f"{save_folder}/table_detection.jpg")
 
-def draw_and_save_ocr(image, results, font_path, output_file):
-    """Draw and save the OCR results on the image."""
-    result = results[0]
+def text_detection(image_path, font_path, save_folder):
+    ocr = PaddleOCR(use_angle_cls=True, lang="german")
+    result = ocr.ocr(image_path, cls=True)
+    for idx in range(len(result)):
+        res = result[idx]
+        for line in res:
+            print(line)
+
+    # draw ocr result
+    result = result[0]
+    image = Image.open(image_path).convert("RGB")
     boxes = [line[0] for line in result]
     txts = [line[1][0] for line in result]
     scores = [line[1][1] for line in result]
     im_show = draw_ocr(image, boxes, txts, scores, font_path=font_path)
     im_show = Image.fromarray(im_show)
-    im_show.save(output_file)
+    im_show.save(f"{save_folder}/ocr_result.jpg")
 
 def main():
-    save_folder = './output'
-    img_path = './sample/CM-HU1157_10.png'
-    font_path = './fonts/german.ttf'
+    ensure_directory_exists(SAVE_FOLDER)
     
-    try:
-        img = load_image(img_path)
-        result = detect_table_structure(img)
-        save_detection_results(result, save_folder, os.path.basename(img_path))
-        
-        for line in result:
-            line.pop('img')
-            print(line)
-        
-        image = Image.open(img_path).convert('RGB')
-        draw_and_save_results(image, result, font_path, 'table_detection.jpg')
-        draw_and_save_ocr(image, result, font_path, 'ocr.jpg')
-        
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    # Table Detection
+    table_result = table_detection(IMG_PATH, SAVE_FOLDER)
+    draw_table_results(IMG_PATH, table_result, FONT_PATH, SAVE_FOLDER)
+    
+    # Text Detection
+    text_detection(IMG_PATH, FONT_PATH, SAVE_FOLDER)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
