@@ -1,4 +1,5 @@
 import os
+
 import cv2
 from paddleocr import (
     PaddleOCR,
@@ -14,9 +15,11 @@ SAVE_FOLDER = "./output"
 IMG_PATH = "./sample/sample-460x460.png"
 FONT_PATH = "./fonts/german.ttf"
 
-DET_MODEL_DIR = "./models/ppstructure/inference/text_detection/ch_PP-OCRv3_det_infer"
-REC_MODEL_DIR = "./models/ppstructure/inference/text_recognition/ch_PP-OCRv3_rec_infer"
-TABLE_MODEL_DIR = "./models/ppstructure/inference/table_recognition/en_ppocr_mobile_v2.0_table_structure_infer"
+# DET_MODEL_DIR = "./models/ppstructure/inference/text_detection/ch_PP-OCRv3_det_infer"
+# REC_MODEL_DIR = "./models/ppstructure/inference/text_recognition/ch_PP-OCRv3_rec_infer"
+TABLE_MODEL_DIR = (
+    "models/PP-StructureV2/table_en/en_ppstructure_mobile_v2.0_SLANet_infer"
+)
 # LAYOUT_MODEL_DIR = "./models/ppstructure/inference/layout_analysis/picodet_lcnet_x1_0_fgd_layout_cdla_infer"
 
 
@@ -39,11 +42,13 @@ def table_detection(image_path, save_folder):
     img = cv2.imread(image_path)
     if img is None:
         raise ValueError(f"Image at path {image_path} could not be loaded.")
-    
-    print(f"Image shape: {img.shape}")
-    
+
+    print("IMAGE SHAPE---------------------->", img.shape[1::-1])
+
     result = table_engine(img)
-    save_structure_res(result, save_folder, f"{os.path.basename(image_path).split('.')[0]}_3")
+    save_structure_res(
+        result, save_folder, f"{os.path.basename(image_path).split('.')[0]}_3"
+    )
 
     for line in result:
         line.pop("img")
@@ -60,7 +65,12 @@ def draw_table_results(image_path, result, font_path, save_folder):
 
 
 def text_detection(image_path, font_path, save_folder):
-    ocr = PaddleOCR(use_angle_cls=True, lang="german", det_model_dir=DET_MODEL_DIR, rec_model_dir=REC_MODEL_DIR)
+    ocr = PaddleOCR(
+        use_angle_cls=True,
+        lang="german",
+        # det_model_dir=DET_MODEL_DIR,
+        # rec_model_dir=REC_MODEL_DIR,
+    )
     result = ocr.ocr(image_path, cls=True)
     for idx in range(len(result)):
         res = result[idx]
