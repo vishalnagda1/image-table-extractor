@@ -13,14 +13,14 @@ from PIL import Image
 # Constants
 SAVE_FOLDER = "./output"
 IMG_PATH = "./sample/sample-460x460.png"
-FONT_PATH = "./fonts/german.ttf"
+FONT_PATH = "./fonts/latin.ttf"
 
-# DET_MODEL_DIR = "./models/ppstructure/inference/text_detection/ch_PP-OCRv3_det_infer"
-# REC_MODEL_DIR = "./models/ppstructure/inference/text_recognition/ch_PP-OCRv3_rec_infer"
+DET_MODEL_DIR = "models/default/PP-OCRv4/det_en/en_PP-OCRv3_det_infer"
+REC_MODEL_DIR = "models/default/PP-OCRv4/rec_en/en_PP-OCRv4_rec_infer"
 TABLE_MODEL_DIR = (
-    "models/PP-StructureV2/table_en/en_ppstructure_mobile_v2.0_SLANet_infer"
+    "models/default/PP-StructureV2/table_en/en_ppstructure_mobile_v2.0_SLANet_infer"
 )
-LAYOUT_MODEL_DIR = "models/PP-StructureV2/layout_en/picodet_lcnet_x1_0_fgd_layout_infer"
+LAYOUT_MODEL_DIR = "models/default/PP-StructureV2/layout_en/picodet_lcnet_x1_0_fgd_layout_infer"
 
 
 def ensure_directory_exists(directory):
@@ -67,9 +67,9 @@ def draw_table_results(image_path, result, font_path, save_folder):
 def text_detection(image_path, font_path, save_folder):
     ocr = PaddleOCR(
         use_angle_cls=True,
-        lang="german",
-        # det_model_dir=DET_MODEL_DIR,
-        # rec_model_dir=REC_MODEL_DIR,
+        lang="en",
+        det_model_dir=DET_MODEL_DIR,
+        rec_model_dir=REC_MODEL_DIR,
     )
     result = ocr.ocr(image_path, cls=True)
     for idx in range(len(result)):
