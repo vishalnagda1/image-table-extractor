@@ -20,7 +20,7 @@ FONT_PATH = "./fonts/german.ttf"
 TABLE_MODEL_DIR = (
     "models/PP-StructureV2/table_en/en_ppstructure_mobile_v2.0_SLANet_infer"
 )
-# LAYOUT_MODEL_DIR = "./models/ppstructure/inference/layout_analysis/picodet_lcnet_x1_0_fgd_layout_cdla_infer"
+LAYOUT_MODEL_DIR = "models/PP-StructureV2/layout_en/picodet_lcnet_x1_0_fgd_layout_infer"
 
 
 def ensure_directory_exists(directory):
@@ -36,7 +36,7 @@ def table_detection(image_path, save_folder):
         # det_model_dir=DET_MODEL_DIR,
         # rec_model_dir=REC_MODEL_DIR,
         table_model_dir=TABLE_MODEL_DIR,
-        # layout_model_dir=LAYOUT_MODEL_DIR,
+        layout_model_dir=LAYOUT_MODEL_DIR,
     )
 
     img = cv2.imread(image_path)
