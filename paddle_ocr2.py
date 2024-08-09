@@ -12,7 +12,7 @@ from PIL import Image
 
 # Constants
 SAVE_FOLDER = "./output"
-IMG_PATH = "./sample/CM-HU1157_10.png"
+IMG_PATH = "./sample/sample-460x460.png"
 FONT_PATH = "./fonts/german.ttf"
 
 
@@ -24,8 +24,9 @@ def ensure_directory_exists(directory):
 def table_detection(image_path, save_folder):
     table_engine = PPStructure(show_log=True, image_orientation=True, lang="en")
     img = cv2.imread(image_path)
+    print("IMAGE SHAPE---------------------->", img.shape[1::-1])
     result = table_engine(img)
-    save_structure_res(result, save_folder, os.path.basename(image_path).split(".")[0])
+    save_structure_res(result, save_folder, f"{os.path.basename(image_path).split('.')[0]}_2")
 
     for line in result:
         line.pop("img")
@@ -38,7 +39,7 @@ def draw_table_results(image_path, result, font_path, save_folder):
     image = Image.open(image_path).convert("RGB")
     im_show = draw_structure_result(image, result, font_path=font_path)
     im_show = Image.fromarray(im_show)
-    im_show.save(f"{save_folder}/table_detection.jpg")
+    im_show.save(f"{save_folder}/table_detection2.jpg")
 
 
 def text_detection(image_path, font_path, save_folder):
@@ -57,7 +58,7 @@ def text_detection(image_path, font_path, save_folder):
     scores = [line[1][1] for line in result]
     im_show = draw_ocr(image, boxes, txts, scores, font_path=font_path)
     im_show = Image.fromarray(im_show)
-    im_show.save(f"{save_folder}/ocr_result.jpg")
+    im_show.save(f"{save_folder}/ocr_result2.jpg")
 
 
 def main():
