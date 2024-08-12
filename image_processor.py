@@ -1,7 +1,7 @@
 import os
 import cv2
 
-class ImageProcessorCV2:
+class ImageProcessor:
     """
     Processes an image with padding, resizing, grayscale conversion, and more using OpenCV.
     """
@@ -236,7 +236,7 @@ if __name__ == "__main__":
     input_image_path = "sample/sample.png"
     
     # Case 1: No output directory or image name specified, defaults to './output/sample.png'
-    resizer = ImageProcessorCV2(input_image_path)
+    resizer = ImageProcessor(input_image_path)
     output_path = resizer.add_padding(10).make_square().resize(1.5).to_grayscale().save()
     print(f"Final image saved at: {output_path}")
     
@@ -245,30 +245,30 @@ if __name__ == "__main__":
     print(f"Image dimensions: {dimensions}")
     
     # Case 2: Specified output directory without image name, uses input image name in the given directory
-    resizer = ImageProcessorCV2(input_image_path, output_directory_or_path="output_images/")
+    resizer = ImageProcessor(input_image_path, output_directory_or_path="output_images/")
     output_path = resizer.add_padding(10).make_square().resize_to_dimensions(800, 600).to_grayscale().save()
     print(f"Final image saved at: {output_path}")
     print(f"Image dimensions: {resizer.get_dimensions()}")
     
     # Case 3: Specified output directory with image name
-    resizer = ImageProcessorCV2(input_image_path, output_directory_or_path="output_images/custom_name.png")
+    resizer = ImageProcessor(input_image_path, output_directory_or_path="output_images/custom_name.png")
     output_path = resizer.add_padding(10).make_square().resize_to_dimensions(1024, 768).save()
     print(f"Final image saved at: {output_path}")
     print(f"Image dimensions: {resizer.get_dimensions()}")
     
     # Case 4: Specified output directory, then provide a different name at save time
-    resizer = ImageProcessorCV2(input_image_path, output_directory_or_path="output_images/")
+    resizer = ImageProcessor(input_image_path, output_directory_or_path="output_images/")
     output_path = resizer.add_padding(10).make_square().resize(0.75).save("final_image.png")
     print(f"Final image saved at: {output_path}")
     print(f"Image dimensions: {resizer.get_dimensions()}")
     
     # Case 5: Specified output directory with image name, then provide a different name at save time
-    resizer = ImageProcessorCV2(input_image_path, output_directory_or_path="output_images/custom_name.png")
+    resizer = ImageProcessor(input_image_path, output_directory_or_path="output_images/custom_name.png")
     output_path = resizer.add_padding(10).make_square().resize_to_dimensions(640, 480).save("final_image.png")
     print(f"Final image saved at: {output_path}")
     print(f"Image dimensions: {resizer.get_dimensions()}")
 
-    resizer = ImageProcessorCV2(input_image_path)
+    resizer = ImageProcessor(input_image_path)
     output_path = (
         resizer.add_padding(10)
         .make_square()
