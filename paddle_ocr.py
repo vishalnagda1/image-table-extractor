@@ -2,6 +2,8 @@ import os
 import cv2
 from paddleocr import PaddleOCR, PPStructure, draw_ocr, draw_structure_result, save_structure_res
 from PIL import Image
+from image_processor import ImageProcessor
+from image_enhancer import ImageEnhancer
 
 class OCRProcessor:
     def __init__(self, save_folder, img_path, font_path):
@@ -87,9 +89,18 @@ class OCRProcessor:
 
 
 if __name__ == "__main__":
+
+    input_image_path = "sample/sample.png"
+    
+    image_enhancer = ImageEnhancer(input_image_path)
+    enhanced_image_path = image_enhancer.enhance(outscale=2).save("enhanced.png")
+    
+    img_processor = ImageProcessor(enhanced_image_path)
+    intermediate_img_path = img_processor.add_padding(10).make_square().save("processed.png")
+
     processor = OCRProcessor(
         save_folder="./output",
-        img_path="output/transform1.png",
+        img_path=intermediate_img_path,
         font_path="./fonts/german.ttf"
     )
     processor.process_image()
