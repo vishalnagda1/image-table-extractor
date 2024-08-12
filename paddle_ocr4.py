@@ -1,7 +1,10 @@
 import os
 import cv2
+import pandas as pd
 from paddleocr import PaddleOCR, PPStructure, draw_ocr, draw_structure_result, save_structure_res
 from PIL import Image
+from image_processor import ImageProcessor
+from image_enhancer import ImageEnhancer
 
 class OCRProcessor:
     def __init__(self, save_folder, img_path, font_path):
@@ -12,7 +15,8 @@ class OCRProcessor:
         self.det_model_dir = "models/default/PP-OCRv4/det_en/en_PP-OCRv3_det_infer"
         self.rec_model_dir = "models/default/PP-OCRv4/rec_en/en_PP-OCRv4_rec_infer"
         self.table_model_dir = "models/default/PP-StructureV2/table_en/en_ppstructure_mobile_v2.0_SLANet_infer"
-        self.layout_model_dir = "models/default/PP-StructureV2/layout_en/picodet_lcnet_x1_0_fgd_layout_infer"
+        self.layout_model_dir = "models/custom/PP-StructureV2/layout_en/picodet_lcnet_x1_0_fgd_layout_infer"
+        self.layout_dict_path = "models/custom/PP-StructureV2/layout_en/layout_publaynet_dict.txt"
 
         self.result_table = None
         self.result_text = None
@@ -30,6 +34,7 @@ class OCRProcessor:
             lang="en",
             table_model_dir=self.table_model_dir,
             layout_model_dir=self.layout_model_dir,
+            layout_dict_path=self.layout_dict_path
         )
 
         img = cv2.imread(self.img_path)
@@ -39,13 +44,14 @@ class OCRProcessor:
         print("IMAGE SHAPE---------------------->", img.shape[1::-1])
 
         self.result_table = table_engine(img)
+
         save_structure_res(
             self.result_table, self.save_folder, f"{os.path.basename(self.img_path).split('.')[0]}_structure"
         )
 
         for line in self.result_table:
             line.pop("img")
-            print(line)
+            # print(line)
 
         return self
 
@@ -92,16 +98,6 @@ class OCRProcessor:
 
         return self
 
-    def table_to_excel(self):
-        # Example implementation to export the table to an Excel file.
-        if self.result_table is None:
-            raise ValueError("No table result found. Please run detect_table() first.")
-
-        # Implementation code to convert the table result to an Excel file.
-
-        print("Table data has been exported to an Excel file.")
-        return self
-
     def text_to_string(self, delimiter="\n"):
         """
         Converts the detected text into a single string, joined by the specified delimiter.
@@ -118,10 +114,16 @@ class OCRProcessor:
 
 
 if __name__ == "__main__":
-    input_image_path = "sample/sample.png"
+    input_image_path = "sample/CM-HU1157_10.png"
 
-    processor = OCRProcessor(save_folder="./output", img_path=input_image_path, font_path="./fonts/german.ttf")
-    table = processor.detect_table().draw_table_result()
-    text = processor.detect_text().draw_text_result()
+    image_enhancer = ImageEnhancer(input_image_path)
+    enhanced_image_path = image_enhancer.enhance(outscale=2).save("enhanced.png")
+    
+    # img_processor = ImageProcessor(enhanced_image_path)
+    # intermediate_img_path = img_processor.add_padding(10).make_square().save("processed.png")
+    
+    processor = OCRProcessor(save_folder="./output", img_path=enhanced_image_path, font_path="./fonts/german.ttf")
+    table = processor.detect_table()
+    # text = processor.detect_text().draw_text_result()
     # table.table_to_excel()
-    text_str = text.text_to_string()
+    # text_str = text.text_to_string()
